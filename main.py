@@ -10,13 +10,17 @@ import re
 from jsondb.db import Database
 db = Database('/home/joost/Documents/Github/Markplaats_scraping/articles.db')
 
+#search = input('Voer het zoekveld in, gebruik voor enters een +. Bijvoorbeeld iphone+6: ')
+#postcode = input('Voer het postocde veld in: ')
+#distance = input('Voer de afstand in in meters. Bijvoorbeeld 3 km is 3000: ')
 
 driver = webdriver.Chrome('/home/joost/Downloads/chromedriver')
 def initialise():
-    driver.get('https://marktplaats.nl')
+    #driver.get('https://www.marktplaats.nl/z.html?query='+ search + '&categoryId=0&postcode='+ postcode + '&distance=' + distance)
+    driver.get('https://www.marktplaats.nl/z.html?query=iphone+6&categoryId=1953&postcode=3445TA&distance=3000')
+
     cookie = driver.find_element_by_xpath("//input[@value='Cookies accepteren']");
     cookie.click()
-    driver.get('https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-6.html?query=iphone%206&categoryId=1953&distance=15000&sortBy=price&sortOrder=increasing')
 initialise()
 siteArticles = []
 try:
@@ -39,7 +43,16 @@ try:
                      for date in dates]
             print(len(dates))
             descriptions1 = [description.text for description in driver.find_elements_by_xpath("//section[@class='search-results-table table']/article/div/div[@class='cell column-listing']/div[@class='listing-title-description']/a/span[@class='mp-listing-description']")]
-            descriptions2 = [re.sub( '\s+', ' ', description.get_attribute('innerHTML')).strip() for description in driver.find_elements_by_xpath("//section[@class='search-results-table table']/article/div/div[@class='cell column-listing']/div[@class='listing-title-description']/a/span[@class='mp-listing-description-extended wrapped']")]
+            descriptions2 = []
+            for description in driver.find_elements_by_xpath("//section[@class='search-results-table table']/article/div/div[@class='cell column-listing']/div[@class='listing-title-description']/a"):
+                try:
+                    descriptions2.append(re.sub( '\s', ' ',description.find_element_by_xpath(".//span[@class='mp-listing-description-extended wrapped']").get_attribute('innerHTML')).strip())
+                    pass
+
+                except:
+                    descriptions2.append('')
+                    pass
+            #descriptions2 = [re.sub( '\s+', ' ', description.get_attribute('innerHTML')).strip() for description in driver.find_elements_by_xpath("//section[@class='search-results-table table']/article/div/div[@class='cell column-listing']/div[@class='listing-title-description']/a/span[@class='mp-listing-description-extended wrapped']")]
             print(str(descriptions2) + '\n')
             descriptions = [description[0] if description[1] == None else ''.join((description[0], description[1])) for description in zip_longest(descriptions1, descriptions2)]
             print([price.text for price in driver.find_elements_by_xpath("//section[@class='search-results-table table']/article/div/div[@class='cell column-price meta-info']/div[@class='price-and-thumb-container']/span/span")])
