@@ -6,10 +6,12 @@ import time
 from mail import sendMail
 from itertools import zip_longest
 locale.setlocale(locale.LC_ALL, 'nl_NL.utf8')
+#from pyvirtualdisplay import Display
 import re
-
 from jsondb.db import Database
-db = Database('articles.db')
+#display = Display(visible=0, size=(800, 600))
+#display.start()
+db = Database('/home/joost/Documents/Github/Markplaats_scraping/articles.db')
 driver = webdriver.Chrome('/home/joost/Downloads/chromedriver')
 def initialise():
     driver.get('https://marktplaats.nl')
@@ -79,8 +81,6 @@ try:
                 siteArticles.append((titles[i], dates[i], str(descriptions[i]), prices[i], cities[i], links[i]))
             try:
                 driver.get(nextClick)
-            except selenium.common.exceptions.NoSuchElementException:
-                break
             except:
                 break
             time.sleep(0.5)
@@ -160,11 +160,11 @@ for siteArticle in siteArticles:
             ):
             articleList = list(db['iphone 6'])
             if type(siteArticle[3]) == float:
-                if (siteArticle[3] <= 140 and siteArticle[3] > 50):
+                if (siteArticle[3] <= 100 and siteArticle[3] > 50):
                     articleList.append({"title" : siteArticle[0], "date" : siteArticle[1], "description" : siteArticle[2], "price" : siteArticle[3], "city" : siteArticle[4], "link" : siteArticle[5]})
-                    sendMail(title=siteArticle[0], price=(str(siteArticle[3]) + 'euro'), description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
+                    sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
                     print('float send\n')
-                    time.sleep(5)
+
                 else:
                     pass
             else:
@@ -173,20 +173,23 @@ for siteArticle in siteArticles:
                 elif siteArticle[3] == 'Bieden':
                     driver.get(siteArticle[5])
                     bid = driver.find_element_by_xpath("//div[@id='page-wrapper']/div[@id='content']/aside[@class='l-side-right']/section[@id='vip-bidding-block']/div[@id='vip-list-bids-block']/div[@id='bids-overview']").get_attribute('data-current-top-bid-formatted')
-                    try:
-                        siteArticle[3] = float((bid[2:]).replace(',', '.'))
-                        if siteArticle[3] < 100:
-                            sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
-                        else:
-                            pass
-                    except:
-                        raise
+                    temp_siteArticle = list(siteArticle)
+                    temp_siteArticle[3] = float(bid[2:].replace(',', '.'))
+                    siteArticle = temp_siteArticle
+                    articleList.append({"title" : siteArticle[0], "date" : siteArticle[1], "description" : siteArticle[2], "price" : siteArticle[3], "city" : siteArticle[4], "link" : siteArticle[5]})
+                    if siteArticle[3] < 120:
+                        sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
+                        print('Bieden send\n')
+                        pass
+                    pass
                 else:
                     articleList.append({"title" : siteArticle[0], "date" : siteArticle[1], "description" : siteArticle[2], "price" : siteArticle[3], "city" : siteArticle[4], "link" : siteArticle[5]})
                     sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
                     print('string send\n')
-                    time.sleep(5)
+
             db['iphone 6'] = articleList
         else:
             pass
+
 driver.quit()
+#display.stop()

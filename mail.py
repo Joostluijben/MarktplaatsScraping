@@ -7,11 +7,11 @@ from email.header import Header
 from email.mime.text import MIMEText
 
 def sendMail(title,price,description, city, link, date):
-    gmailUser = 'joost.luijben@gmail.com'
-    gmailPassword = 'joostyoshi'
+    gmailUser = 'marktplaats.bot@gmail.com'
+    gmailPassword = 'joost111'
 
     sentFrom = gmailUser
-    to = 'joost.luijben@yahoo.com'
+    to = 'marktplaats   .bot@gmail.com'
 
     msg = MIMEMultipart()
     msg['Subject'] = 'Nieuwe marktplaats advertentie'
