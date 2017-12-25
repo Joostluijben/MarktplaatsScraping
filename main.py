@@ -6,47 +6,17 @@ import time
 from mail import sendMail
 from itertools import zip_longest
 locale.setlocale(locale.LC_ALL, 'nl_NL.utf8')
-#from pyvirtualdisplay import Display
 import re
 from jsondb.db import Database
-#display = Display(visible=0, size=(800, 600))
-#display.start()
 db = Database('/home/joost/Documents/Github/Markplaats_scraping/articles.db')
+
+
 driver = webdriver.Chrome('/home/joost/Downloads/chromedriver')
 def initialise():
     driver.get('https://marktplaats.nl')
     cookie = driver.find_element_by_xpath("//input[@value='Cookies accepteren']");
     cookie.click()
-
-    search = driver.find_element_by_xpath("//input[@name='query']")
-    search.clear()
-    querySearch = "iphone 6"
-    search.send_keys(querySearch)
-
-    category = driver.find_element_by_xpath("//select[@name='categoryId']/option[text()='Telecommunicatie']")
-    category.click()
-    postcode = driver.find_element_by_xpath("//input[@name='postcode']")
-    postcode.clear()
-    postcode.send_keys("3445TA")
-
-    distance = driver.find_element_by_xpath("//select[@name='distance']/option[text()='< 15 km']")
-    distance.click()
-
-    submit = driver.find_element_by_xpath("//button[@type='submit']")
-    submit.click()
-    iphoneCategory = driver.find_element_by_xpath("//div[@id='page-wrapper']/div[@class='l-page']/section[@id='left-column-container']/div[@id='search-attributes']/form[@id='search-attributes-form']/div[@class='relevant-categories filter-section']/ul/li[@class='level-two parent-category-id-820']/a").get_attribute('href')
-    driver.get(iphoneCategory)
-    #priceFrom = driver.find_element_by_xpath("//input[@name='priceFrom']")
-    #priceFrom.send_keys('50')
-
-    #priceTo = driver.find_element_by_xpath("//input[@name='priceTo']")
-    #priceTo.send_keys('200')
-    #refreshPrice = driver.find_element_by_xpath("//button[@class='button mp-Button mp-Button--secondary mp-Button--sm search-attribute-submit']")
-    #refreshPrice.click()
-
-    #sort = driver.find_element_by_xpath("//select[@id='sort-order']/option[text()='Prijs (laag-hoog)']")
-    #time.sleep(0.2)
-    #sort.click()
+    driver.get('https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-6.html?query=iphone%206&categoryId=1953&distance=15000&sortBy=price&sortOrder=increasing')
 initialise()
 siteArticles = []
 try:
@@ -57,7 +27,6 @@ except:
 try:
     nextClick = (driver.find_element_by_xpath("//div[@id='page-wrapper']/div[@class='l-page']/div[@class='l-main-right']/div[@id='search-results']/div[@id='pagination']/a[@class='mp-Button mp-Button--round pagination-next']")).get_attribute('href')
     while True:
-        print('hoi')
         try:
             nextClick = (driver.find_element_by_xpath("//div[@id='page-wrapper']/div[@class='l-page']/div[@class='l-main-right']/div[@id='search-results']/div[@id='pagination']/a[@class='mp-Button mp-Button--round pagination-next']")).get_attribute('href')
             print(nextClick)
