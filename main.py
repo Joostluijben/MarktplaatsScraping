@@ -22,6 +22,11 @@ def initialise():
     cookie = driver.find_element_by_xpath("//input[@value='Cookies accepteren']");
     cookie.click()
 initialise()
+search = 'iphone 7'
+if db[search] == None:
+    db[search] = []
+else:
+    pass
 siteArticles = []
 try:
     pageCount = int((driver.find_element_by_xpath("//div[@id='page-wrapper']/div[@class='l-page']/div[@class='l-main-right']/div[@id='search-results']/div[@id='pagination']/span[@id='pagination-pages']/span[@class='last']")).get_attribute('innerHTML'))
@@ -73,9 +78,8 @@ except:
     raise
     print('doe dit maar 1 keer')
 dbList = []
-for row in db:
-    for article in db[row]:
-        dbList.append((article['title'], article['date']))
+for article in db[search]:
+    dbList.append((article['title'], article['date']))
 for siteArticle in siteArticles:
     if tuple((siteArticle[0], siteArticle[1])) not in dbList:
         if (
@@ -140,7 +144,7 @@ for siteArticle in siteArticles:
             'icloud gelockt' not in siteArticle[0] and
             'icloud gelockt' not in siteArticle[2]
             ):
-            articleList = list(db['iphone 6'])
+            articleList = list(db[search])
             if type(siteArticle[3]) == float:
                 if (siteArticle[3] <= 100 and siteArticle[3] > 50):
                     articleList.append({"title" : siteArticle[0], "date" : siteArticle[1], "description" : siteArticle[2], "price" : siteArticle[3], "city" : siteArticle[4], "link" : siteArticle[5]})
@@ -169,13 +173,13 @@ for siteArticle in siteArticles:
                     sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
                     print('string send\n')
 
-            db['iphone 6'] = articleList
+            db[search] = articleList
         else:
             pass
-tempDbList = list(db['iphone 6'])
+tempDbList = list(db[search])
 for index, article in enumerate(tempDbList):
     if tuple((article['title'], article['date'])) not in tuple([tuple((siteArticle[0], siteArticle[1])) for siteArticle in siteArticles]):
         tempDbList.pop(index)
-db['iphone 6'] = tempDbList
+db[search] = tempDbList
 driver.quit()
 #display.stop()
