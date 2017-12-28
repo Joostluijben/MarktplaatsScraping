@@ -172,6 +172,10 @@ for siteArticle in siteArticles:
             db['iphone 6'] = articleList
         else:
             pass
-
+tempDbList = list(db['iphone 6'])
+for index, article in enumerate(tempDbList):
+    if tuple((article['title'], article['date'])) not in tuple([tuple((siteArticle[0], siteArticle[1])) for siteArticle in siteArticles]):
+        tempDbList.pop(index)
+db['iphone 6'] = tempDbList
 driver.quit()
 #display.stop()
