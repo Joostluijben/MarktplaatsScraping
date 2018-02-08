@@ -9,7 +9,7 @@ locale.setlocale(locale.LC_ALL, 'nl_NL.utf8')
 import re
 from jsondb.db import Database
 from searchManager import readSearches
-db = Database('/home/joost/Documents/Github/Markplaats_scraping/articles.db')
+db = Database('articles.db')
 
 #search = input('Voer het zoekveld in, gebruik voor enters een +. Bijvoorbeeld iphone+6: ')
 #postcode = input('Voer het postocde veld in: ')
@@ -17,7 +17,8 @@ db = Database('/home/joost/Documents/Github/Markplaats_scraping/articles.db')
 
 for search in readSearches():
     driver = webdriver.Chrome('/home/joost/Downloads/chromedriver')
-    driver.get('https://www.marktplaats.nl/z.html?query=' +search.replace(' ', '+') +'&categoryId=820&postcode=3445TA&distance=3000')
+    #driver = webdriver.PhantomJS()
+    driver.get('https://www.marktplaats.nl/z.html?query=' +search[0].replace(' ', '+') +'&categoryId=820&postcode=3445TA&distance=3000')
     cookie = driver.find_element_by_xpath("//input[@value='Cookies accepteren']");
     cookie.click()
     time.sleep(2)
