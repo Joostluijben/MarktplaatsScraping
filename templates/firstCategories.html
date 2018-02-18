@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+  <form action='/secondCategories', method='post'>
+    <select name='firstCategory'>
+      <option value='0'>Alle categorieën</option>
+    {% for category in firstCategories %}
+      <option value='{{ loop.index }}'>{{ category }}</option>
+    {% endfor %}
+  </select>
+  <br>
+  <input type='submit'>
+</form>
+  </body>
+</html>

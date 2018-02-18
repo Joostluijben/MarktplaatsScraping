@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+   <style>
+    #searchTable th, #searchTable td, #searchTable{
+      border: 1px solid black;
+      text-align: left;
+    }
+    #searchTable {
+      border-collapse: collapse;
+      width: 40%;
+    }
+    #searchTable th, #searchTable td {
+      padding: 15px;
+    }
+    #searchTable th {
+      background-color: #4CAF50;
+      color: white
+    }
+    #searchTable tr:hover {
+      background-color: #ddd
+    }
+
+    #domeTable th{
+      text-align: center;
+    }
+
+    #articleTable {
+      text-align: left;
+      border-collapse: collapse;
+    }
+    #articleTable th {
+      padding-top: 20px
+    }
+    #articleTable td {
+      border: 1px solid black;
+      width: 10%
+    }
+    #addButton {
+      margin-bottom: 20px
+    }
+    .zoekOpdracht {
+      margin-bottom: 20px
+    }
+
+    </style>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+  <table id='searchTable'>
+    <th>Zoekopdracht</th>
+    <th>Maximale prijs</th>
+    <th>Minimale prijs</th>
+    <th>Maximale prijs voor bieden</th>
+    <th>Afstand</th>
+    <th>Postcode</th>
+    <th></th>
+    {% for search in searches %}
+    <tr>
+      <td>{{search[0]}}</td>
+      <td>€ {{search[1]}}</td>
+      <td>€ {{search[2]}}</td>
+      <td>€ {{search[3]}}</td>
+      <td>{{search[4] | int / 1000}} km </td>
+      <td>{{search[5]}}</td>
+      <td><form action="remove.html" method="get"><input type="submit" value='Verwijder'></input></form></td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <form action="" id='addButton' method='post'>
+    <input type="submit" value="Nieuwe zoekopdracht" name='submit'/>
+  </form>
+
+  <table id='domeTable'>
+  {% for i in range(searches | count) %}
+    <th class='zoekOpdracht'><b>Zoekopdracht:</b></th>
+    <table id='articleTable'>
+      <th>Title</th>
+      <th>Price</th>
+      <th>Datum</th>
+      <th>Plaats</th>
+      <th>Beschrijving</th>
+      <th>Link</th>
+      {% for n in range(articles[i] | count) %}
+      <tr>
+        <td>{{articles[i][n]['title']}}</td>
+        {% if articles[i][n]['price'] == 'Zie omschrijving' or articles[i][n] == 'N.o.t.k.'%}
+          <td> {{articles[i][n]['price']}}</td>
+        {% else %}
+          <td>€ {{articles[i][n]['price']}}</td>
+        {%endif%}
+        <td>{{articles[i][n]['date']}}</td>
+        <td>{{articles[i][n]['city']}}</td>
+        <td>{{articles[i][n]['description']}}</td>
+        <td> <a target="_blank" href='{{articles[i][n]['link']}}'>{{articles[i][n]['link']}}</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  <br/>
+  {% endfor %}
+  </table>
+  </div>
+  </body>
+
+</html>
