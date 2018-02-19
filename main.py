@@ -9,7 +9,7 @@ from searchManager import readSearches
 from mail import sendMail
 from collections import OrderedDict
 locale.setlocale(locale.LC_ALL, 'nl_NL.utf8')
-db = Database('/home/joost/Documents/Markplaats_prototype/http/articles.db')
+db = Database('articles.db')
 for search in readSearches():
     firstPage = search[6]
     loadPage = requests.get(str(firstPage) + '&postcode=' + str(search[5]))
@@ -152,7 +152,7 @@ for search in readSearches():
                 if type(siteArticle[3]) == float:
                     if (siteArticle[3] <= int(search[1]) and siteArticle[3] > int(search[2])):
                         articleList.append({"title" : siteArticle[0], "date" : siteArticle[1], "description" : siteArticle[2], "price" : siteArticle[3], "city" : siteArticle[4], "link" : siteArticle[5]})
-                        #sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
+                        sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
                         print('float send\n')
 
                     else:
@@ -174,13 +174,13 @@ for search in readSearches():
                         siteArticle = temp_siteArticle
                         if siteArticle[3]    < int(search[3]):
                             articleList.append({"title" : siteArticle[0], "date" : siteArticle[1], "description" : siteArticle[2], "price" : siteArticle[3], "city" : siteArticle[4], "link" : siteArticle[5]})
-                            #sendMail(title=siteArticle[0], price=(str(siteArticle[3]) +' (Bieden)'), description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
+                            sendMail(title=siteArticle[0], price=(str(siteArticle[3]) +' (Bieden)'), description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
                             print('Bieden send\n')
                             pass
                         pass
                     else:
                         articleList.append({"title" : siteArticle[0], "date" : siteArticle[1], "description" : siteArticle[2], "price" : siteArticle[3], "city" : siteArticle[4], "link" : siteArticle[5]})
-                        #sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
+                        sendMail(title=siteArticle[0], price=siteArticle[3], description=siteArticle[2], city=siteArticle[4], link=siteArticle[5], date=siteArticle[1])
                         print('String send\n')
 
                 db[search[0]] = articleList

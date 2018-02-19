@@ -12,7 +12,7 @@ from flask import url_for
 from flask import session
 
 app = Flask(__name__)
-db = Database('/home/joost/Documents/Markplaats_prototype/http/articles.db')
+db = Database('articles.db')
 
 
 @app.route('/', methods=['GET', 'POST'])
