@@ -81,7 +81,7 @@ def deleteAdverts():
         soup = BeautifulSoup(page.content, 'lxml')
         old = soup.find('div', class_='mp-Alert mp-Alert--tip evip-caption')
         if old is not None:
-            cursor.execute("DELETE * FROM Advert WHERE link = %s", (link,))
+            cursor.execute("DELETE FROM Advert WHERE link = %s", (link[0],))
 
 
 def addSearch(title, maxPrice, minPrice, maxBidPrice, distance, zipCode, link):
