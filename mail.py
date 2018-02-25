@@ -5,9 +5,11 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.mime.text import MIMEText
+import datetime
 
 
 def sendMail(title, price, description, city, link, date):
+    date = datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%d-%m-%Y")
     gmailUser = 'marktplaats.bot@gmail.com'
     gmailPassword = 'joost111'
 

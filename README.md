@@ -1,5 +1,5 @@
 # MarktplaatsScraping
 <b>Dependecies</b>
 </br>
-jsondb</br>
+mysql.connector</br>
 smptlib</br>
