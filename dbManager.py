@@ -37,7 +37,7 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                                             description, price,
                                             isPriceString, city,
                                             link,))
-            #sendMail(title, price, description, city, link, date)
+            sendMail(title, price, description, city, link, date)
     except ValueError:
         if price == 'Bieden':
             isPriceString = False
@@ -58,8 +58,8 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                                                 description, bid,
                                                 isPriceString, city,
                                                 link,))
-                    #sendMail(title, bid + ' (Bieden)', description, city,
-                    #         link, date)
+                    sendMail(title, bid + ' (Bieden)', description, city,
+                             link, date)
 
             except Exception as e:
                 'Old advert'
@@ -71,4 +71,4 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                            "link) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
                            (searchID, title, date, description, price,
                             isPriceString, city, link,))
-            #sendMail(title, price, description, city, link, date)
+            sendMail(title, price, description, city, link, date)
