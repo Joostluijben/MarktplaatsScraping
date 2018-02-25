@@ -5,6 +5,7 @@ import locale
 import re
 from dbManager import insertAdvert
 from dbManager import connDb
+from dbManager import deleteAdverts
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.utf8')
 # connect to database
@@ -21,7 +22,6 @@ excluded = ['Gezocht', 'gezocht', 'NU', 'ACTIE!!', 'ruilen', 'Afgeprijsd!',
             'Aktie!', 'Refurbished', 'gegarandeerd', 'trixon.nl', 'KPN',
             'GARANTIE!', 'Phonestuff', 'inruil', 'Garantie', 'garantie',
             'Informatie']
-
 secondCursor = conn.cursor(buffered=True)
 secondCursor.execute("SELECT link FROM Advert")
 for advert in secondCursor.fetchall():
@@ -67,5 +67,6 @@ for search in cursor.fetchall():
                     insertAdvert(article, title, description, search[0],
                                  search[2], search[3], search[4], link)
 connDb.commit()
-
+deleteAdverts()
+connDb.commit()
 conn.close()

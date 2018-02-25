@@ -72,3 +72,13 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                            (searchID, title, date, description, price,
                             isPriceString, city, link,))
             #sendMail(title, price, description, city, link, date)
+
+
+def deleteAdverts():
+    cursor.execute("SELECT link FROM Advert")
+    for link in cursor.fetchall():
+        page = requests.get(link[0])
+        soup = BeautifulSoup(page.content, 'lxml')
+        old = soup.find('div', class_='mp-Alert mp-Alert--tip evip-caption')
+        if old is not None:
+            cursor.execute("DELETE * FROM Advert WHERE link = %s", (link,))
