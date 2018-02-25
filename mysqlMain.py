@@ -21,7 +21,7 @@ included = ['barst', 'Barst', 'scherm', 'Scherm', 'accu', 'Accu', 'camera',
 excluded = ['Gezocht', 'gezocht', 'NU', 'ACTIE!!', 'ruilen', 'Afgeprijsd!',
             'Aktie!', 'Refurbished', 'gegarandeerd', 'trixon.nl', 'KPN',
             'GARANTIE!', 'Phonestuff', 'inruil', 'Garantie', 'garantie',
-            'Informatie']
+            'Informatie', 'moederbord']
 secondCursor = conn.cursor(buffered=True)
 secondCursor.execute("SELECT link FROM Advert")
 for advert in secondCursor.fetchall():
@@ -29,7 +29,6 @@ for advert in secondCursor.fetchall():
 # get all searches
 cursor.execute("SELECT * FROM Search")
 for search in cursor.fetchall():
-    print(search)
     firstPage = search[7]
     loadPage = requests.get(str(firstPage) + '&postcode=' + str(search[6]))
     firstSoup = BeautifulSoup(loadPage.content, 'lxml')

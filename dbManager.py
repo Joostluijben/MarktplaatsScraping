@@ -82,3 +82,16 @@ def deleteAdverts():
         old = soup.find('div', class_='mp-Alert mp-Alert--tip evip-caption')
         if old is not None:
             cursor.execute("DELETE * FROM Advert WHERE link = %s", (link,))
+
+
+def addSearch(title, maxPrice, minPrice, maxBidPrice, distance, zipCode, link):
+    cursor.execute("INSERT INTO Search (query, maxPrice, minPrice," +
+                   "maxBidPrice, distance, zipCode, link) " +
+                   "VALUES (%s, %s, %s, %s, %s, %s, %s)", (title,
+                                                           maxPrice,
+                                                           minPrice,
+                                                           maxBidPrice,
+                                                           distance,
+                                                           zipCode,
+                                                           link))
+    connDb.commit()

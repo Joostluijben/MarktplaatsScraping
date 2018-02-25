@@ -8,10 +8,10 @@
     }
     #searchTable {
       border-collapse: collapse;
-      width: 40%;
     }
     #searchTable th, #searchTable td {
       padding: 15px;
+      width: 30%;
     }
     #searchTable th {
       background-color: #4CAF50;
@@ -19,10 +19,6 @@
     }
     #searchTable tr:hover {
       background-color: #ddd
-    }
-
-    #domeTable th{
-      text-align: center;
     }
 
     #articleTable {
@@ -36,72 +32,71 @@
       border: 1px solid black;
       width: 10%
     }
-    #addButton {
-      margin-bottom: 20px
-    }
-    .zoekOpdracht {
-      margin-bottom: 20px
-    }
 
     </style>
     <meta charset="utf-8">
-    <title></title>
+    <title>Bot overzicht</title>
   </head>
   <body>
-  <table id='searchTable'>
-    <th>Zoekopdracht</th>
-    <th>Maximale prijs</th>
-    <th>Minimale prijs</th>
-    <th>Maximale prijs voor bieden</th>
-    <th>Afstand</th>
-    <th>Postcode</th>
-    <th></th>
-    {% for search in searches %}
-    <tr>
-      <td>{{search[0]}}</td>
-      <td>€ {{search[1]}}</td>
-      <td>€ {{search[2]}}</td>
-      <td>€ {{search[3]}}</td>
-      <td>{{search[4] | int / 1000}} km </td>
-      <td>{{search[5]}}</td>
-      <td><form action="remove.html" method="get"><input type="submit" value='Verwijder'></input></form></td>
-    </tr>
-    {% endfor %}
-  </table>
-
-  <form action="" id='addButton' method='post'>
-    <input type="submit" value="Nieuwe zoekopdracht" name='submit'/>
-  </form>
-
-  <table id='domeTable'>
-  {% for i in range(searches | count) %}
-    <th class='zoekOpdracht'><b>Zoekopdracht:</b></th>
-    <table id='articleTable'>
-      <th>Title</th>
-      <th>Price</th>
-      <th>Datum</th>
-      <th>Plaats</th>
-      <th>Beschrijving</th>
+  <table id="searchTable">
+    <thead>
+      <th>Titel</th>
+      <th>Maximale prijs</th>
+      <th>Minimale prijs</th>
+      <th>Maximale bied prijs</th>
+      <th>Afstand</th>
+      <th>Postcode</th>
       <th>Link</th>
-      {% for n in range(articles[i] | count) %}
-      <tr>
-        <td>{{articles[i][n]['title']}}</td>
-        {% if articles[i][n]['price'] == 'Zie omschrijving' or articles[i][n] == 'N.o.t.k.'%}
-          <td> {{articles[i][n]['price']}}</td>
-        {% else %}
-          <td>€ {{articles[i][n]['price']}}</td>
-        {%endif%}
-        <td>{{articles[i][n]['date']}}</td>
-        <td>{{articles[i][n]['city']}}</td>
-        <td>{{articles[i][n]['description']}}</td>
-        <td> <a target="_blank" href='{{articles[i][n]['link']}}'>{{articles[i][n]['link']}}</a></td>
-      </tr>
+    </thead>
+    <tbody>
+      {% for search in searches %}
+        <tr>
+          <td>{{ search[1] }}</td>
+          <td>&#8364; {{ search[2] }}</td>
+          <td>&#8364; {{ search[3] }}</td>
+          <td>&#8364; {{ search[4] }}</td>
+          <td>{{ search[5] }} km</td>
+          <td>{{ search[6] }}</td>
+          <td><a href='{{ search[7] }}', target='_blank'>{{search[7]}}</a></td>
+        </tr>
       {% endfor %}
-    </table>
-  <br/>
-  {% endfor %}
+    </tbody>
   </table>
-  </div>
-  </body>
+  <form action="" id='addButton' method='post'>
+   <input type="submit" value="Nieuwe zoekopdracht" name='submit'/>
+ </form>
 
+  {% for i in range(searches | count ) %}
+  <h2>{{ searches[i][1] }}:</h2>
+    <table id="articleTable">
+      <thead>
+        <th>Titel</th>
+        <th>Datum verschijning</th>
+        <th>Beschrijving</th>
+        <th>Prijs</th>
+        <th>Plaats</th>
+        <th>Link</th>
+      </thead>
+      <tbody>
+        {% for advert in adverts %}
+        <tr>
+          {% if advert[1] == searches[i][0] %}
+          <td>{{ advert[2] }}</td>
+          <td>{{ advert[3]}}</td>
+          <td>{{ advert[4]}}</td>
+          {% if advert[5] is number %}
+            <td>&#8364; {{ advert[5]}}</td>
+          {% else %}
+            <td>{{ advert[6] }}
+          {% endif %}
+          <td>{{ advert[8]}}</td>
+          <td><a href='{{ advert[9]}}' target='_blank'>{{ advert[9]}}</a></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endfor %}
+
+  </body>
 </html>
