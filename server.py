@@ -1,46 +1,69 @@
 from flask import render_template
 from flask import Flask
-from jsondb.db import Database
-from searchManager import readSearches
-from itertools import zip_longest
 from flask import request
-from jsondb.db import Database
 from bs4 import BeautifulSoup
 import requests
 from flask import redirect
 from flask import url_for
 from flask import session
+import mysql.connector
+import datetime
+from dbManager import addSearch
+
+conn = mysql.connector.connect(user='joost', password='passwd',
+                               host='localhost', database='marktplaats')
+secondCursor = conn.cursor(buffered=True)
 
 app = Flask(__name__)
-db = Database('articles.db')
 
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    articles = []
-    for search in db:
-        articles.append([article for article in db[search]])
-    searches = readSearches()
+    connMain = mysql.connector.connect(user='joost', password='passwd',
+                                            host='localhost',
+                                            database='marktplaats')
+    cursor = connMain.cursor()
+    searches = []
+    adverts = []
+    cursor.execute("SELECT * FROM Search")
+    for search in cursor.fetchall():
+        search = list(search)
+        search[5] = search[5] / 1000
+        search = tuple(search)
+        searches.append(search)
+    cursor.execute("SELECT * FROM Advert")
+    for advert in cursor.fetchall():
+        advert = list(advert)
+        advert[3] = datetime.datetime.strftime(advert[3], "%d-%m-%Y")
+        advert = tuple(advert)
+        adverts.append(advert)
+    cursor.close()
+    connMain.close()
     if request.method == 'POST':
         if request.form['submit'] == 'Nieuwe zoekopdracht':
             return redirect(url_for('add'))
-    return render_template('index.html', searches=searches, articles=articles)
+    return render_template('index.html', searches=searches, adverts=adverts)
 
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     if request.method == 'POST':
         search = request.form['search']
-        articleMax = request.form['articleMax']
-        articleMin = request.form['articleMin']
-        biddingMax = request.form['biddingMax']
-        distance = request.form['distance']
+        try:
+            articleMax = float(request.form['articleMax'])
+            articleMin = float(request.form['articleMin'])
+            biddingMax = float(request.form['biddingMax'])
+            distance = int(request.form['distance'])
+        except ValueError:
+            return redirect('/')
         zipCode = request.form['zipCode']
         getNewSearch = requests.get('https://www.marktplaats.nl/z.html?query='
                                     + str(search.replace(' ', '+')) +
                                     '&distance=' + str(distance)
                                     + '&postcode='
                                     + str(zipCode))
+        session['newSearch'] = [search, articleMax, articleMin, biddingMax,
+                                distance, zipCode, getNewSearch.url]
         newSearchSoup = BeautifulSoup(getNewSearch.content, 'lxml')
         firstCategoriesCoded = newSearchSoup.find_all('a',
                                                       class_='category-name')
@@ -64,6 +87,7 @@ def secondCategories():
             for text in texts:
                 links.append(text.get('href'))
             getSecondCategory = requests.get(links[index-1])
+            session['firstCategory'] = links[index-1]
             secondCategorySoup = BeautifulSoup(getSecondCategory.content,
                                                'lxml')
             secondCategoriesCoded = secondCategorySoup.select('li.level-two')
@@ -74,6 +98,9 @@ def secondCategories():
             return render_template('secondCategories.html',
                                    secondCategories=secondCategories)
         else:
+            info = session.get('newSearch')
+            addSearch(info[0], info[1], info[2], info[3], info[4],
+                      info[5], info[6])
             return redirect(url_for('process'))
     return render_template('secondCategories.html')
 
@@ -90,9 +117,15 @@ def process():
             for text in texts:
                 links.append(text.get('href'))
             link = links[index-1]
-            print(link)
+            info = session.get('newSearch')
+            addSearch(info[0], info[1], info[2], info[3], info[4],
+                      info[5], link)
         else:
-            return redirect(url_for(''))
+            link = session.get('firstCategory')
+            info = session.get('newSearch')
+            addSearch(info[0], info[1], info[2], info[3], info[4],
+                      info[5], link)
+            return redirect('/')
     return render_template('process.html')
 
 

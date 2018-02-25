@@ -71,7 +71,10 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                            "link) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
                            (searchID, title, date, description, price,
                             isPriceString, city, link,))
+<<<<<<< HEAD
             sendMail(title, price, description, city, link, date)
+=======
+            #sendMail(title, price, description, city, link, date)
 
 
 def deleteAdverts():
@@ -95,3 +98,4 @@ def addSearch(title, maxPrice, minPrice, maxBidPrice, distance, zipCode, link):
                                                            zipCode,
                                                            link))
     connDb.commit()
+>>>>>>> develop
