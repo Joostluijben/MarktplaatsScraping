@@ -58,7 +58,7 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                                                 description, bid,
                                                 isPriceString, city,
                                                 link,))
-                    sendMail(title, bid + ' (Bieden)', description, city,
+                    sendMail(title, str(bid) + ' (Bieden)', description, city,
                              link, date)
 
             except Exception as e:
