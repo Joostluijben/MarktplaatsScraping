@@ -2,9 +2,25 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>Bot overzicht</title>
   </head>
-  <body>
-
+  <body onload="dbAdd()">
+    <p>U wordt in <span id="timer_div"></span> seconden doorgestuurd naar het hoofdmenu</p>
   </body>
+  <script>
+  function dbAdd() {
+    alert("Alles is succesvol uitgevoerd");
+  }
+  var seconds_left = 5;
+  document.getElementById('timer_div').innerHTML = seconds_left;
+  var interval = setInterval(function() {
+      document.getElementById('timer_div').innerHTML = -- seconds_left;
+
+      if (seconds_left <= 0)
+          {
+              window.location = "/";
+              clearInterval(interval);
+          }
+      }, 1000);
+    </script>
 </html>

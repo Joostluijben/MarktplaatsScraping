@@ -9,20 +9,22 @@ from flask import session
 import mysql.connector
 import datetime
 from dbManager import addSearch
+from dbManager import deleter
+import re
 
-conn = mysql.connector.connect(user='joost', password='passwd',
-                               host='localhost', database='marktplaats')
-secondCursor = conn.cursor(buffered=True)
+dbUser = 'joost'
+dbPasswd = 'passwd'
+dbHost = 'localhost'
+dbName = 'marktplaats'
+connector = mysql.connector
 
 app = Flask(__name__)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    connMain = mysql.connector.connect(user='joost', password='passwd',
-                                            host='localhost',
-                                            database='marktplaats')
-    cursor = connMain.cursor()
+    conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost, database=dbName)
+    cursor = conn.cursor()
     searches = []
     adverts = []
     cursor.execute("SELECT * FROM Search")
@@ -37,11 +39,11 @@ def main():
         advert[3] = datetime.datetime.strftime(advert[3], "%d-%m-%Y")
         advert = tuple(advert)
         adverts.append(advert)
-    cursor.close()
-    connMain.close()
     if request.method == 'POST':
         if request.form['submit'] == 'Nieuwe zoekopdracht':
             return redirect(url_for('add'))
+    cursor.close()
+    conn.close()
     return render_template('index.html', searches=searches, adverts=adverts)
 
 
@@ -54,6 +56,7 @@ def add():
             articleMin = float(request.form['articleMin'])
             biddingMax = float(request.form['biddingMax'])
             distance = int(request.form['distance'])
+            distance = distance * 1000
         except ValueError:
             return redirect('/')
         zipCode = request.form['zipCode']
@@ -99,6 +102,7 @@ def secondCategories():
                                    secondCategories=secondCategories)
         else:
             info = session.get('newSearch')
+            info[6] = info[6] + '&postcode=' + info[5]
             addSearch(info[0], info[1], info[2], info[3], info[4],
                       info[5], info[6])
             return redirect(url_for('process'))
@@ -106,8 +110,13 @@ def secondCategories():
 
 
 @app.route('/process', methods=['POST', 'GET'])
-def process():
+@app.route('/process/<isAdvert>/<dbID>', methods=['POST', 'GET'])
+def process(isAdvert=None, dbID=None):
+    deleter(dbID=dbID, isAdvert=isAdvert)
     if request.method == 'POST':
+        conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost,
+                                 database=dbName)
+        cursor = conn.cursor()
         index = int(request.form['secondCategory'])
         if index != 0:
             soup = BeautifulSoup(str(session.get('secondCategories')),
@@ -118,15 +127,63 @@ def process():
                 links.append(text.get('href'))
             link = links[index-1]
             info = session.get('newSearch')
+            link = link + '&postcode=' + info[5]
+            cursor.close()
+            conn.close()
             addSearch(info[0], info[1], info[2], info[3], info[4],
                       info[5], link)
         else:
             link = session.get('firstCategory')
             info = session.get('newSearch')
+            info[6] = info[6] + '&postcode=' + info[5]
             addSearch(info[0], info[1], info[2], info[3], info[4],
                       info[5], link)
-            return redirect('/')
+            cursor.close()
+            conn.close()
+            return redirect(url_for('process'))
+        cursor.close()
+        conn.close()
     return render_template('process.html')
+
+
+@app.route('/change/<changeHead>/<dbID>', methods=['POST', 'GET'])
+def change(changeHead, dbID):
+    if request.method == 'POST':
+        conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost,
+                                 database=dbName)
+        changing = request.form['changing']
+        cursor = conn.cursor()
+
+        if (changeHead == 'maxPrice' or changeHead == 'minPrice'
+                or changeHead == 'maxBidPrice' or changeHead == 'distance'):
+            try:
+                changing = int(changing)
+                cursor = conn.cursor()
+                print(changing)
+                print(dbID)
+                sql = """UPDATE Search SET {} = %s WHERE searchID = %s""".format(changeHead)
+                cursor.execute(sql, (changing, dbID,))
+                conn.commit()
+                return redirect('/')
+            except ValueError:
+                pass
+                return redirect('/')
+            except TypeError:
+                pass
+                return redirect('/')
+        elif changeHead == 'zipCode' or changeHead == 'query':
+            try:
+                str(changeHead)
+            except ValueError:
+                return redirect('/')
+            cursor = conn.cursor()
+            sql = """UPDATE Search SET {} = %s WHERE searchID = %s""".format(changeHead)
+            cursor.execute(sql, (changing, dbID,))
+            conn.commit()
+            return redirect('/')
+        cursor.close()
+        conn.close()
+    return render_template('changing.html', changeHead=changeHead)
 
 
 app.secret_key = 'Marktplaats'

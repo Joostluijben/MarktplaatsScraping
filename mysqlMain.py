@@ -4,7 +4,6 @@ import mysql.connector
 import locale
 import re
 from dbManager import insertAdvert
-from dbManager import connDb
 from dbManager import deleteAdverts
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.utf8')
@@ -30,11 +29,13 @@ for advert in secondCursor.fetchall():
 cursor.execute("SELECT * FROM Search")
 for search in cursor.fetchall():
     firstPage = search[7]
-    loadPage = requests.get(str(firstPage) + '&postcode=' + str(search[6]))
+    loadPage = requests.get(firstPage)
+    print(loadPage.url)
     firstSoup = BeautifulSoup(loadPage.content, 'lxml')
     try:
         pageCount = int(firstSoup.find('span', class_='last').text)
-    except ValueError as e:
+        print(pageCount)
+    except AttributeError as e:
         pageCount = 1
     for pageNumber in range(1, pageCount + 1, 1):
         print('On page ' + str(pageNumber) + ' of ' + str(pageCount)
@@ -65,7 +66,6 @@ for search in cursor.fetchall():
                             for include in included)):
                     insertAdvert(article, title, description, search[0],
                                  search[2], search[3], search[4], link)
-connDb.commit()
 deleteAdverts()
-connDb.commit()
+cursor.close()
 conn.close()

@@ -4,9 +4,11 @@ from bs4 import BeautifulSoup
 import datetime
 from mail import sendMail
 
-connDb = mysql.connector.connect(user='joost', password='passwd',
-                                 host='localhost', database='marktplaats')
-cursor = connDb.cursor(buffered=True)
+dbUser = 'joost'
+dbPasswd = 'passwd'
+dbHost = 'localhost'
+dbName = 'marktplaats'
+connector = mysql.connector
 
 
 def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
@@ -26,6 +28,9 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
         date = datetime.datetime.strptime(date, "%d %b. '%y")
         date = date.strftime("%Y-%m-%d")
     price = article.find('span', class_='price-new').text.strip()
+    conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost,
+                             database=dbName)
+    cursor = conn.cursor()
     try:
         isPriceString = False
         price = float(price[2:].replace('.', '').replace(',', '.'))
@@ -58,9 +63,9 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                                                 description, bid,
                                                 isPriceString, city,
                                                 link,))
+
                     #sendMail(title, bid + ' (Bieden)', description, city,
                     #         link, date)
-
             except Exception as e:
                 'Old advert'
                 pass
@@ -71,10 +76,16 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                            "link) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
                            (searchID, title, date, description, price,
                             isPriceString, city, link,))
+    conn.commit()
+    cursor.close()
+    conn.close()
             #sendMail(title, price, description, city, link, date)
 
 
 def deleteAdverts():
+    conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost,
+                             database=dbName)
+    cursor = conn.cursor()
     cursor.execute("SELECT link FROM Advert")
     for link in cursor.fetchall():
         page = requests.get(link[0])
@@ -82,9 +93,15 @@ def deleteAdverts():
         old = soup.find('div', class_='mp-Alert mp-Alert--tip evip-caption')
         if old is not None:
             cursor.execute("DELETE FROM Advert WHERE link = %s", (link[0],))
+            conn.commit()
+    cursor.close()
+    conn.close()
 
 
 def addSearch(title, maxPrice, minPrice, maxBidPrice, distance, zipCode, link):
+    conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost,
+                             database=dbName)
+    cursor = conn.cursor()
     cursor.execute("INSERT INTO Search (query, maxPrice, minPrice," +
                    "maxBidPrice, distance, zipCode, link) " +
                    "VALUES (%s, %s, %s, %s, %s, %s, %s)", (title,
@@ -94,4 +111,29 @@ def addSearch(title, maxPrice, minPrice, maxBidPrice, distance, zipCode, link):
                                                            distance,
                                                            zipCode,
                                                            link))
-    connDb.commit()
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+def deleter(dbID, isAdvert):
+    conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost,
+                             database=dbName)
+    cursor = conn.cursor()
+    try:
+        bool(isAdvert)
+        int(dbID)
+        if isAdvert == 'True':
+            cursor.execute("DELETE FROM Advert WHERE advertID = %s;",
+                           (dbID,))
+            conn.commit()
+        if isAdvert == 'False':
+            cursor.execute("DELETE FROM Search WHERE searchID = %s;",
+                           (dbID,))
+            conn.commit()
+    except ValueError:
+        pass
+    except TypeError:
+        pass
+    cursor.close()
+    conn.close()

@@ -25,7 +25,7 @@ CREATE TABLE `Advert` (
   `city` VARCHAR(150),
   `link` VARCHAR(500) NOT NULL,
   PRIMARY KEY (`advertID`),
-  FOREIGN KEY (searchID) REFERENCES Search(searchID)
+  FOREIGN KEY (searchID) REFERENCES Search(searchID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
