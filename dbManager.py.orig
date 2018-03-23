@@ -63,11 +63,15 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                                                 description, bid,
                                                 isPriceString, city,
                                                 link,))
-                    sendMail(title, str(bid) + ' (Bieden)', description, city,
-                             link, date)
+<<<<<<< HEAD
 
                     #sendMail(title, bid + ' (Bieden)', description, city,
                     #         link, date)
+=======
+                    sendMail(title, str(bid) + ' (Bieden)', description, city,
+                             link, date)
+
+>>>>>>> master
             except Exception as e:
                 'Old advert'
                 pass
@@ -78,10 +82,14 @@ def insertAdvert(article, title, description, searchID, maxPrice, minPrice,
                            "link) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
                            (searchID, title, date, description, price,
                             isPriceString, city, link,))
+<<<<<<< HEAD
     conn.commit()
     cursor.close()
     conn.close()
+            #sendMail(title, price, description, city, link, date)
+=======
             sendMail(title, price, description, city, link, date)
+>>>>>>> master
 
 
 def deleteAdverts():
