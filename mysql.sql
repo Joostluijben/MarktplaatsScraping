@@ -28,10 +28,21 @@ CREATE TABLE `Advert` (
   FOREIGN KEY (searchID) REFERENCES Search(searchID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE `Included` (
+  `includedID` INT AUTO_INCREMENT NOT NULL,
+  `include` VARCHAR(100) NOT NULL,
+	PRIMARY KEY (`includedID`)
+);
+
+CREATE TABLE `Search-included` (
+  `Search-includedID` INT AUTO_INCREMENT,
+  `searchID` INT,
+  `includedID` INT,
+  PRIMARY KEY (`Search-includedID`),
+  FOREIGN KEY (searchID) REFERENCES Search(searchID),
+  FOREIGN KEY (includedID) REFERENCES Included(includedID)
+);
 
 USE marktplaats;
 INSERT INTO Search (query, maxPrice, minPrice, maxBidPrice, distance, zipCode, link)
-VALUES ("iphone 7", 300, 200, 300, 15000, "3445TA","https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-7.html?query=iphone%207&categoryId=1953&distance=15000"), ("iphone 6", 100, 50, 100 ,15000, "3445TA","https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-6.html?query=iphone%206&categoryId=1953&distance=15000");
-
-INSERT INTO Advert(searchID, title, date, description, priceNumber, isPriceString, city, link)
-VALUES (2, "Apple Iphone 6 Space Grey 16 - 2 jaar garantie - BTW", '2018-01-24', "iphone 6", 269, False, "Woerden, UT", "https://www.marktplaats.nl/a/telecommunicatie/mobiele-telefoons-apple-iphone/m1247918419-apple-iphone-6-gold-16gb-2-jaar-garantie-btw.html?c=8c285449651fa109c354bbabe740c1b&previousPage=lr");
+VALUES ("iphone 7", 300, 200, 300, 15000, "3445TA","https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-7.html?query=iphone%207&categoryId=1953&distance=15000&postcode=3445TA"), ("iphone 6", 100, 50, 100 ,15000, "3445TA","https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-6.html?query=iphone%206&categoryId=1953&distance=15000&postcode=3445TA");

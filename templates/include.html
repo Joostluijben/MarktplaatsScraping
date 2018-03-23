@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Marktplaatsbot</title>
+  </head>
+  <body>
+    <a href="/">Terug naar beginscherm</a>
+    <h3>Hier staan alle woorden die in je zoekadvertentie MOETEN zitten</h3>
+    <table>
+      <th>Woord</th>
+      <th>Verwijder</th>
+      {% for include in includes %}
+      <tr>
+        <td>{{include[0]}}</td>
+        <td><form method="post" action="/getInclude/{{searchID}}/{{include[1]}}"><input type="submit" value="Verwijder" name="submit"/></form></td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br>
+    <br>
+    <form method="post" action="">
+      <input type="text" name="newInclude"/><br>
+      <input type="submit" value="Voeg nieuw woord toe" name="submit">
+    </form>
+  </body>
+</html>

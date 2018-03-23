@@ -45,6 +45,8 @@
       <th>Minimale prijs</th>
       <th>Maximale bied prijs</th>
       <th>Afstand</th>
+      <th>Bekijk includes</th>
+      <th>Bekijk excludes</th>
       <th>Postcode</th>
       <th>Link</th>
       <th>Verwijder</th>
@@ -52,9 +54,7 @@
     <tbody>
       {% for search in searches %}
         <tr>
-          <td>{{ search[1] }}<form action="/change/query/{{search[0]}}">
-                              <input type='submit' value='Wijzig'/>
-                              </form></td>
+          <td>{{ search[1] }}</td>
           <td>&#8364; {{ search[2] }}<form action="/change/maxPrice/{{search[0]}}">
                               <input type='submit' value='Wijzig'/>
                               </form></td>
@@ -64,8 +64,12 @@
           <td>&#8364; {{ search[4] }}<form action="/change/maxBidPrice/{{search[0]}}">
                               <input type="submit" value="Wijzig"/>
                               </form></td>
-          <td>{{ search[5] }} km<form action="/change/distance/{{search[0]}}">
-                              <input type="submit" value="Wijzig"/>
+                              <td>{{ search[5] }} km<form action="/change/distance/{{search[0]}}">
+                                                  <input type="submit" value="Wijzig"/>
+                                                  </form></td>
+                              <td><form action="/getInclude/{{search[0]}}"><input type="submit" value="Bekijk">
+                              </form></td>
+                              <td><form action="/getExclude/{{search[0]}}"><input type="submit" value="Bekijk">
                               </form></td>
           <td>{{ search[6] }}<form action="/change/zipCode/{{search[0]}}">
                               <input type="submit" value="Wijzig"/>

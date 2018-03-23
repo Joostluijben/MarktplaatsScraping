@@ -25,13 +25,16 @@ secondCursor = conn.cursor(buffered=True)
 secondCursor.execute("SELECT link FROM Advert")
 for advert in secondCursor.fetchall():
     dbList.append(advert[0])
+thirdCursor = conn.cursor(buffered=True)
+fourthCursor = conn.cursor(buffered=True)
 # get all searches
 cursor.execute("SELECT * FROM Search")
 for search in cursor.fetchall():
-    firstPage = search[7]
+    firstPage = search[7] + '&distance=' + str(search[5]) + "&postcode=" + search[6]
+    print(firstPage)
     loadPage = requests.get(firstPage)
-    print(loadPage.url)
     firstSoup = BeautifulSoup(loadPage.content, 'lxml')
+
     try:
         pageCount = int(firstSoup.find('span', class_='last').text)
         print(pageCount)
@@ -41,8 +44,9 @@ for search in cursor.fetchall():
         print('On page ' + str(pageNumber) + ' of ' + str(pageCount)
               + '. Loading...\n')
         page = requests.get(str(firstPage) + str('&currentPage=') +
-                            str(pageNumber) + '&postcode=' + str(search[6]))
+                            str(pageNumber))
         soup = BeautifulSoup(page.content, 'lxml')
+        count = 0
         for article in soup.select('article.row.search-result'):
             link = article.get('data-url')
             if link not in dbList:
@@ -51,7 +55,6 @@ for search in cursor.fetchall():
                 description1 = description1.strip()
                 description2 = article.find('span', class_='mp-listing-desc' +
                                             'ription-extended wrapped')
-
                 title = article.find('span', class_='mp-listing-title').text
                 if description2 is None:
                     description = description1
@@ -59,11 +62,11 @@ for search in cursor.fetchall():
                     description2 = re.sub('\s', ' ', description2.text)
                     description2 = description2.strip()
                     description = description1 + description2
-
-                if (all(exclude not in title and exclude not in description
-                        for exclude in excluded) and
-                        any(include in title or include in description
-                            for include in included)):
+                thirdCursor.execute("SELECT include FROM Included, Search, SearchIncluded WHERE Search.searchID = %s AND SearchIncluded.searchID = Search.searchID AND Included.includedID = SearchIncluded.includedID;", (search[0],))
+                fourthCursor.execute("SELECT exclude FROM Excluded, Search, SearchExcluded WHERE Search.searchID = %s AND SearchExcluded.searchID = Search.searchID AND Excluded.excludedID = SearchExcluded.excludedID;", (search[0],))
+                count += 1
+                if (any(include[0] in title or include[0] in description for include in thirdCursor.fetchall()) and
+                    all(exclude[0] not in title and exclude[0] not in description for exclude in fourthCursor.fetchall())):
                     insertAdvert(article, title, description, search[0],
                                  search[2], search[3], search[4], link)
 deleteAdverts()

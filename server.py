@@ -61,10 +61,7 @@ def add():
             return redirect('/')
         zipCode = request.form['zipCode']
         getNewSearch = requests.get('https://www.marktplaats.nl/z.html?query='
-                                    + str(search.replace(' ', '+')) +
-                                    '&distance=' + str(distance)
-                                    + '&postcode='
-                                    + str(zipCode))
+                                    + str(search.replace(' ', '+')))
         session['newSearch'] = [search, articleMax, articleMin, biddingMax,
                                 distance, zipCode, getNewSearch.url]
         newSearchSoup = BeautifulSoup(getNewSearch.content, 'lxml')
@@ -127,7 +124,6 @@ def process(isAdvert=None, dbID=None):
                 links.append(text.get('href'))
             link = links[index-1]
             info = session.get('newSearch')
-            link = link + '&postcode=' + info[5]
             cursor.close()
             conn.close()
             addSearch(info[0], info[1], info[2], info[3], info[4],
@@ -135,7 +131,6 @@ def process(isAdvert=None, dbID=None):
         else:
             link = session.get('firstCategory')
             info = session.get('newSearch')
-            info[6] = info[6] + '&postcode=' + info[5]
             addSearch(info[0], info[1], info[2], info[3], info[4],
                       info[5], link)
             cursor.close()
@@ -158,9 +153,10 @@ def change(changeHead, dbID):
                 or changeHead == 'maxBidPrice' or changeHead == 'distance'):
             try:
                 changing = int(changing)
+                if changeHead == 'distance':
+                    changing = changing * 1000
+                    pass
                 cursor = conn.cursor()
-                print(changing)
-                print(dbID)
                 sql = """UPDATE Search SET {} = %s WHERE searchID = %s""".format(changeHead)
                 cursor.execute(sql, (changing, dbID,))
                 conn.commit()
@@ -171,7 +167,7 @@ def change(changeHead, dbID):
             except TypeError:
                 pass
                 return redirect('/')
-        elif changeHead == 'zipCode' or changeHead == 'query':
+        elif changeHead == 'zipCode':
             try:
                 str(changeHead)
             except ValueError:
@@ -185,6 +181,79 @@ def change(changeHead, dbID):
         conn.close()
     return render_template('changing.html', changeHead=changeHead)
 
+
+@app.route('/getInclude/<searchID>/', methods=['GET', 'POST'])
+@app.route('/getInclude/<searchID>/<includedID>', methods=['GET', 'POST'])
+def getInclude(searchID, includedID=None):
+    try:
+        int(searchID)
+    except TypeError:
+        return redirect('/')
+    except ValueError:
+        return redirect('/')
+    conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost,
+                             database=dbName)
+    cursor = conn.cursor()
+    sql = "SELECT include, Included.includedID FROM Included, Search, SearchIncluded WHERE Search.searchID = %s AND SearchIncluded.searchID = Search.searchID AND Included.includedID = SearchIncluded.includedID;"
+    cursor.execute(sql, (searchID,))
+    includes = cursor.fetchall()
+    if request.method == 'POST':
+        if request.form['submit'] == 'Verwijder':
+            cursor = conn.cursor()
+            getSql = "SELECT Included.includedID FROM Included, Search, SearchIncluded WHERE Search.searchID = %s AND Included.includedID = %s AND SearchIncluded.searchID = Search.searchID AND Included.includedID = SearchIncluded.includedID"
+            cursor.execute(getSql, (searchID, includedID,))
+            deleteID = int(cursor.fetchone()[0])
+            cursor.execute("DELETE FROM Included WHERE includedID = %s", (deleteID,))
+            conn.commit()
+            return redirect(url_for('getInclude', searchID=searchID))
+        elif request.form['submit'] == 'Voeg nieuw woord toe':
+            cursor = conn.cursor()
+            newInclude = request.form['newInclude']
+            insertSql = "INSERT INTO Included(include) VALUES(%s)"
+            cursor.execute(insertSql, (newInclude,))
+            conn.commit()
+            secondInsertSql = "INSERT INTO SearchIncluded(searchID, includedID) VALUES (%s, %s)"
+            cursor.execute(secondInsertSql, (searchID, cursor.lastrowid))
+            conn.commit()
+            return redirect(url_for('getInclude', searchID=searchID))
+    return render_template('include.html', includes=includes, searchID=searchID)
+
+
+@app.route('/getExclude/<searchID>/', methods=['GET', 'POST'])
+@app.route('/getExclude/<searchID>/<excludedID>', methods=['GET', 'POST'])
+def getExclude(searchID, excludedID=None):
+    try:
+        int(searchID)
+    except TypeError:
+        return redirect('/')
+    except ValueError:
+        return redirect('/')
+    conn = connector.connect(user=dbUser, password=dbPasswd, host=dbHost,
+                             database=dbName)
+    cursor = conn.cursor()
+    sql = "SELECT exclude, Excluded.excludedID FROM Excluded, Search, SearchExcluded WHERE Search.searchID = %s AND SearchExcluded.searchID = Search.searchID AND Excluded.excludedID = SearchExcluded.excludedID;"
+    cursor.execute(sql, (searchID,))
+    excludes = cursor.fetchall()
+    if request.method == 'POST':
+        if request.form['submit'] == 'Verwijder':
+            cursor = conn.cursor()
+            getSql = "SELECT Excluded.excludedID FROM Excluded, Search, SearchExcluded WHERE Search.searchID = %s AND Excluded.ExcludedID = %s AND SearchExcluded.searchID = Search.searchID AND Excluded.ExcludedID = SearchExcluded.ExcludedID"
+            cursor.execute(getSql, (searchID, excludedID,))
+            deleteID = int(cursor.fetchone()[0])
+            cursor.execute("DELETE FROM Excluded WHERE excludedID = %s", (deleteID,))
+            conn.commit()
+            return redirect(url_for('getExclude', searchID=searchID))
+        elif request.form['submit'] == 'Voeg nieuw woord toe':
+            cursor = conn.cursor()
+            newExclude = request.form['newExclude']
+            insertSql = "INSERT INTO Excluded(exclude) VALUES(%s)"
+            cursor.execute(insertSql, (newExclude,))
+            conn.commit()
+            secondInsertSql = "INSERT INTO SearchExcluded(searchID, excludedID) VALUES (%s, %s)"
+            cursor.execute(secondInsertSql, (searchID, cursor.lastrowid))
+            conn.commit()
+            return redirect(url_for('getExclude', searchID=searchID))
+    return render_template('exclude.html', excludes=excludes, searchID=searchID)
 
 app.secret_key = 'Marktplaats'
 app.run('0.0.0.0', 8080, debug=True, threaded=True)
