@@ -5,6 +5,7 @@ import locale
 import re
 from dbManager import insertAdvert
 from dbManager import deleteAdverts
+from dbManager import bidRefresher
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.utf8')
 # connect to database
@@ -14,13 +15,6 @@ cursor = conn.cursor(buffered=True)
 
 dbList = []
 
-included = ['barst', 'Barst', 'scherm', 'Scherm', 'accu', 'Accu', 'camera',
-            'Camera', 'defect', 'Defect', 'speaker', 'Speaker', 'home', 'Home',
-            'button', 'Button']
-excluded = ['Gezocht', 'gezocht', 'NU', 'ACTIE!!', 'ruilen', 'Afgeprijsd!',
-            'Aktie!', 'Refurbished', 'gegarandeerd', 'trixon.nl', 'KPN',
-            'GARANTIE!', 'Phonestuff', 'inruil', 'Garantie', 'garantie',
-            'Informatie', 'moederbord']
 secondCursor = conn.cursor(buffered=True)
 secondCursor.execute("SELECT link FROM Advert")
 for advert in secondCursor.fetchall():
@@ -29,6 +23,7 @@ thirdCursor = conn.cursor(buffered=True)
 fourthCursor = conn.cursor(buffered=True)
 # get all searches
 cursor.execute("SELECT * FROM Search")
+webLinks = []
 for search in cursor.fetchall():
     firstPage = search[7] + '&distance=' + str(search[5]) + "&postcode=" + search[6]
     print(firstPage)
@@ -49,6 +44,7 @@ for search in cursor.fetchall():
         count = 0
         for article in soup.select('article.row.search-result'):
             link = article.get('data-url')
+            webLinks.append(link)
             if link not in dbList:
                 description1 = article.find('span', class_='mp-listing-' +
                                             'description').text
@@ -66,9 +62,16 @@ for search in cursor.fetchall():
                 fourthCursor.execute("SELECT exclude FROM Excluded, Search, SearchExcluded WHERE Search.searchID = %s AND SearchExcluded.searchID = Search.searchID AND Excluded.excludedID = SearchExcluded.excludedID;", (search[0],))
                 count += 1
                 if (any(include[0] in title or include[0] in description for include in thirdCursor.fetchall()) and
-                    all(exclude[0] not in title and exclude[0] not in description for exclude in fourthCursor.fetchall())):
+                        all(exclude[0] not in title and exclude[0] not in description for exclude in fourthCursor.fetchall())):
                     insertAdvert(article, title, description, search[0],
                                  search[2], search[3], search[4], link)
+
+cursor.execute("SELECT link, advertID from Advert")
+for link in cursor.fetchall():
+    if link[0] not in webLinks:
+        secondCursor.execute("DELETE FROM Advert WHERE advertID = %s", (link[1],))
+        conn.commit()
 deleteAdverts()
+bidRefresher()
 cursor.close()
 conn.close()

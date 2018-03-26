@@ -5,10 +5,12 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 import datetime
+import requests
 
 
-def sendMail(title, price, description, city, link, date):
+def sendMail(title, price, description, city, link, date, photoLink):
     date = datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%d-%m-%Y")
     gmailUser = 'marktplaats.bot@gmail.com'
     gmailPassword = 'joost111'
@@ -26,7 +28,17 @@ def sendMail(title, price, description, city, link, date):
             '"\n\n De persoon woont in: ' + city +
             '\n\n De link is: ' + link + '\n\n Deze staat er sinds '
             + date + ' op')
-    msg.attach(MIMEText(body, 'plain', 'utf-8'))
+    html = ('<html><head></head><body><br>Nieuw product met titel: "' + title +
+            '" <br><br> Deze kost: ' + str(price).replace('.', ',') +
+            '<br><br>De beschrijving is: "' + description +
+            '"<br><br> De persoon woont in: ' + city +
+            '<br><br> De link is: <a href="' + link + '">' + photoLink +
+            '</a><br><br> Deze staat er sinds '
+            + date + ' op</body></html>')
+    f = requests.get(photoLink)
+    img = MIMEImage(f.content)
+    msg.attach(img)
+    msg.attach(MIMEText(html, 'html', 'utf-8'))
     try:
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
@@ -35,4 +47,5 @@ def sendMail(title, price, description, city, link, date):
         server.close()
         print('Sent email')
     except:
+        raise
         print('Something went wrong..')

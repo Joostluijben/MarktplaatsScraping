@@ -37,6 +37,7 @@
     <meta charset="utf-8">
     <title>Bot overzicht</title>
   </head>
+  <h2>Hieronder staan alle ingevoerde zoekopdrachten</h2>
   <body>
   <table id="searchTable">
     <thead>
@@ -86,15 +87,18 @@
   <form action="" id='addButton' method='post'>
    <input type="submit" value="Nieuwe zoekopdracht" name='submit'/>
  </form>
-
+<h2>Hieronder staan de zoekresultaten voor elke zoekopdracht. Dit wordt elk
+halfuur geupdate</h2>
   {% for i in range(searches | count ) %}
   <h2>{{ searches[i][1] }}:</h2>
     <table id="articleTable">
       <thead>
+        <th>Foto</th>
         <th>Titel</th>
         <th>Datum verschijning</th>
         <th>Beschrijving</th>
         <th>Prijs</th>
+        <th>Bieden</th>
         <th>Plaats</th>
         <th>Link</th>
       </thead>
@@ -102,6 +106,7 @@
         {% for advert in adverts %}
         <tr>
           {% if advert[1] == searches[i][0] %}
+          <td><img src="{{advert[11]}}" alt="advertentieFoto"></td>
           <td>{{ advert[2] }}</td>
           <td>{{ advert[3]}}</td>
           <td>{{ advert[4]}}</td>
@@ -110,8 +115,13 @@
           {% else %}
             <td>{{ advert[6] }}
           {% endif %}
-          <td>{{ advert[8]}}</td>
-          <td><a href='{{ advert[9]}}' target='_blank'>{{ advert[9]}}</a></td>
+          {% if advert[8] %}
+            <td>Ja</td>
+          {% else %}
+            <td>Nee</td>
+          {% endif %}
+          <td>{{ advert[9]}}</td>
+          <td><a href='{{ advert[10]}}' target='_blank'>{{ advert[10]}}</a></td>
           <td><form action="/process/True/{{advert[0]}}">
                 <input type="submit" value="Verwijder" />
               </form>
