@@ -66,11 +66,11 @@ for search in cursor.fetchall():
                     insertAdvert(article, title, description, search[0],
                                  search[2], search[3], search[4], link)
 
-cursor.execute("SELECT link, advertID from Advert")
-for link in cursor.fetchall():
-    if link[0] not in webLinks:
-        secondCursor.execute("DELETE FROM Advert WHERE advertID = %s", (link[1],))
-        conn.commit()
+# cursor.execute("SELECT link, advertID from Advert")
+# for link in cursor.fetchall():
+#    if link[0] not in webLinks:
+#        secondCursor.execute("DELETE FROM Advert WHERE advertID = %s", (link[1],))
+#        conn.commit()
 deleteAdverts()
 bidRefresher()
 cursor.close()
