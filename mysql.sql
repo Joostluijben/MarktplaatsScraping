@@ -22,8 +22,10 @@ CREATE TABLE `Advert` (
   `priceNumber` DECIMAL,
   priceString VARCHAR(30),
   isPriceString BOOLEAN,
+  isBidding BOOLEAN,
   `city` VARCHAR(150),
   `link` VARCHAR(500) NOT NULL,
+  photoLink VARCHAR(500),
   PRIMARY KEY (`advertID`),
   FOREIGN KEY (searchID) REFERENCES Search(searchID) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -34,18 +36,277 @@ CREATE TABLE `Included` (
 	PRIMARY KEY (`includedID`)
 );
 
-CREATE TABLE `Search-included` (
-  `Search-includedID` INT AUTO_INCREMENT,
+CREATE TABLE `Excluded` (
+  `excludedID` INT AUTO_INCREMENT,
+  `exclude` VARCHAR(100),
+  PRIMARY KEY (`excludedID`)
+);
+
+CREATE TABLE `SearchIncluded` (
+  `SearchIncludedID` INT AUTO_INCREMENT,
   `searchID` INT,
   `includedID` INT,
-  PRIMARY KEY (`Search-includedID`),
-  FOREIGN KEY (searchID) REFERENCES Search(searchID),
-  FOREIGN KEY (includedID) REFERENCES Included(includedID)
+  PRIMARY KEY (`SearchIncludedID`),
+  FOREIGN KEY (searchID) REFERENCES Search(searchID) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (includedID) REFERENCES Included(includedID) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE `SearchExcluded` (
+  `searchExcludedID` INT AUTO_INCREMENT,
+  `searchID` INT,
+  `excludedID` INT,
+  PRIMARY KEY (`searchExcludedID`),
+  FOREIGN KEY (searchID) REFERENCES Search(searchID) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (excludedID) REFERENCES Excluded(excludedID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
 
 USE marktplaats;
 INSERT INTO Search (query, maxPrice, minPrice, maxBidPrice, distance, zipCode, link)
-VALUES ("iphone 7", 300, 200, 300, 15000, "3445TA","https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-7.html?query=iphone%207&categoryId=1953&distance=15000"), ("iphone 6", 100, 50, 100 ,15000, "3445TA","https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-6.html?query=iphone%206&categoryId=1953&distance=15000");
+VALUES ("iphone 7", 300, 200, 300, 15000, "3445TA","https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-7.html?query=iphone%207&categoryId=1953"), ("iphone 6", 100, 50, 100 ,15000, "3445TA","https://www.marktplaats.nl/z/telecommunicatie/mobiele-telefoons-apple-iphone/iphone-6.html?query=iphone%206&categoryId=1953");
 
-INSERT INTO Advert(searchID, title, date, description, priceNumber, isPriceString, city, link)
-VALUES (2, "Apple Iphone 6 Space Grey 16 - 2 jaar garantie - BTW", '2018-01-24', "iphone 6", 269, False, "Woerden, UT", "https://www.marktplaats.nl/a/telecommunicatie/mobiele-telefoons-apple-iphone/m1247918419-apple-iphone-6-gold-16gb-2-jaar-garantie-btw.html?c=8c285449651fa109c354bbabe740c1b&previousPage=lr");
+INSERT INTO Included(include)
+VALUES("barst");
+
+INSERT INTO Included(include)
+VALUES("Barst");
+
+INSERT INTO Included(include)
+VALUES("scherm");
+
+INSERT INTO Included(include)
+VALUES("Scherm");
+
+INSERT INTO Included(include)
+VALUES("accu");
+
+INSERT INTO Included(include)
+VALUES("Accu");
+
+INSERT INTO Included(include)
+VALUES("camera");
+
+INSERT INTO Included(include)
+VALUES("Camera");
+
+INSERT INTO Included(include)
+VALUES("defect");
+
+INSERT INTO Included(include)
+VALUES("Defect");
+
+INSERT INTO Included(include)
+VALUES("speaker");
+
+INSERT INTO Included(include)
+VALUES("Speaker");
+
+INSERT INTO Included(include)
+VALUES("home");
+
+INSERT INTO Included(include)
+VALUES("Home");
+
+INSERT INTO Included(include)
+VALUES("button");
+
+INSERT INTO Included(include)
+VALUES("Button");
+
+
+INSERT INTO Excluded(exclude)
+VALUES("Gezocht");
+
+INSERT INTO Excluded(exclude)
+VALUES("gezocht");
+
+INSERT INTO Excluded(exclude)
+VALUES("NU");
+
+INSERT INTO Excluded(exclude)
+VALUES("ACTIE!!");
+
+INSERT INTO Excluded(exclude)
+VALUES("ruilen");
+
+INSERT INTO Excluded(exclude)
+VALUES("Afgeprijsd!");
+
+INSERT INTO Excluded(exclude)
+VALUES("Aktie!");
+
+INSERT INTO Excluded(exclude)
+VALUES("Refurbished");
+
+INSERT INTO Excluded(exclude)
+VALUES("gegarandeerd");
+
+INSERT INTO Excluded(exclude)
+VALUES("trixon.nl");
+
+INSERT INTO Excluded(exclude)
+VALUES("KPN");
+
+INSERT INTO Excluded(exclude)
+VALUES("GARANTIE!");
+
+INSERT INTO Excluded(exclude)
+VALUES("Phonestuff");
+
+INSERT INTO Excluded(exclude)
+VALUES("inruil");
+
+INSERT INTO Excluded(exclude)
+VALUES("garantie");
+
+INSERT INTO Excluded(exclude)
+VALUES("Garantie");
+
+INSERT INTO Excluded(exclude)
+VALUES("Informatie");
+
+INSERT INTO Excluded(exclude)
+VALUES("moederbord");
+
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,1);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,2);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,3);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,4);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,5);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,6);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,7);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,8);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,9);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,10);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,11);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,12);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,13);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,14);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,15);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (1,16);
+
+
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,1);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,2);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,3);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,4);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,5);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,6);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,7);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,8);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,9);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,10);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,11);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,12);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,13);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,14);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,15);
+INSERT INTO SearchIncluded(searchID, includedID)
+VALUES (2,16);
+
+
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES(1,1);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,2);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,3);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,4);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,5);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,6);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,7);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,8);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,9);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,10);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,11);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,12);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,13);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,14);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,15);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,16);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,17);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (1,18);
+
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES(2,1);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,2);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,3);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,4);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,5);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,6);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,7);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,8);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,9);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,10);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,11);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,12);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,13);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,14);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,15);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,16);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,17);
+INSERT INTO SearchExcluded(searchID, excludedID)
+VALUES (2,18);

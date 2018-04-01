@@ -71,7 +71,7 @@ for link in cursor.fetchall():
     if link[0] not in webLinks:
         secondCursor.execute("DELETE FROM Advert WHERE advertID = %s", (link[1],))
 conn.commit()
-deleteAdverts()
 bidRefresher()
+deleteAdverts()
 cursor.close()
 conn.close()
