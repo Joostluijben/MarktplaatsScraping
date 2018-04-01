@@ -99,7 +99,7 @@ def deleteAdverts():
         old = soup.find('div', class_='mp-Alert mp-Alert--tip evip-caption')
         if old is not None:
             cursor.execute("DELETE FROM Advert WHERE link = %s", (link[0],))
-            conn.commit()
+    conn.commit()
     cursor.close()
     conn.close()
 
@@ -117,7 +117,6 @@ def bidRefresher():
         price = float(price[2:].replace('.', '').replace(',', '.'))
         if price != float(link[2]):
             secondCursor.execute("UPDATE Advert SET priceNumber = %s WHERE advertID = %s", (price, link[1]))
-            conn.commit()
     thirdCursor = conn.cursor(buffered=True)
     sql = "SELECT searchID, priceNumber FROM Advert WHERE isPriceString = 0"
     cursor.execute(sql)
@@ -125,7 +124,7 @@ def bidRefresher():
         secondCursor.execute("SELECT maxBidPrice FROM Search WHERE searchID = %s", (advert[0],))
         if advert[1] > int(secondCursor.fetchone()[0]):
             thirdCursor.execute("DELETE FROM Advert WHERE searchID = %s", (advert[0],))
-            conn.commit()
+    conn.commit()
     cursor.close()
     conn.close()
 

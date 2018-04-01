@@ -67,7 +67,7 @@ for search in cursor.fetchall():
                                  search[2], search[3], search[4], link)
 lastCursor = conn.cursor(buffered=True)
 lastCursor.execute("SELECT link, advertID from Advert")
-for link in cursor.fetchall():
+for link in lastCursor.fetchall():
     if link[0] not in webLinks:
         lastCursor.execute("DELETE FROM Advert WHERE advertID = %s", (link[1],))
 conn.commit()
