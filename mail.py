@@ -32,7 +32,7 @@ def sendMail(title, price, description, city, link, date, photoLink):
             '" <br><br> Deze kost: ' + str(price).replace('.', ',') +
             '<br><br>De beschrijving is: "' + description +
             '"<br><br> De persoon woont in: ' + city +
-            '<br><br> De link is: <a href="' + link + '">' + photoLink +
+            '<br><br> De link is: <a href="' + link + '">' + link +
             '</a><br><br> Deze staat er sinds '
             + date + ' op</body></html>')
     f = requests.get(photoLink)
