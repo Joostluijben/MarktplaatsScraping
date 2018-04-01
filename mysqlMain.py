@@ -65,11 +65,11 @@ for search in cursor.fetchall():
                         all(exclude[0] not in title and exclude[0] not in description for exclude in fourthCursor.fetchall())):
                     insertAdvert(article, title, description, search[0],
                                  search[2], search[3], search[4], link)
-
-cursor.execute("SELECT link, advertID from Advert")
+lastCursor = conn.cursor(buffered=True)
+lastCursor.execute("SELECT link, advertID from Advert")
 for link in cursor.fetchall():
     if link[0] not in webLinks:
-        secondCursor.execute("DELETE FROM Advert WHERE advertID = %s", (link[1],))
+        lastCursor.execute("DELETE FROM Advert WHERE advertID = %s", (link[1],))
 conn.commit()
 bidRefresher()
 deleteAdverts()
